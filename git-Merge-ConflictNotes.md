@@ -1,374 +1,484 @@
 
-Git Merge Conflict Notes (Beginner Friendly)
+---
 
-Scenario
+# Git Merge Conflict Notes (Beginner Friendly)
+
+## Scenario
 
 Suppose two developers are working on the same project.
 
-Developer A
+### Developer A (feature1)
 
-Creates a button.
+Adds a Button.
 
-Developer B
+### Developer B (feature2)
 
-Creates a dropdown.
+Adds a Dropdown.
 
-Both modify the same file (index.html).
+Both modify the **same file and same line** (`login.txt`).
 
 Git must decide how to combine their changes.
 
-
 ---
 
-Step 1: Check Current Branch
+## Step 1: Check Current Branch
 
+```bash
 git branch
+```
 
-Purpose
+### Purpose
 
 Shows all available branches.
 
-Example Output
+### Example Output
 
+```bash
 * main
-  feature1
+```
 
-* means you are currently on the main branch.
-
+`*` means you are currently on the `main` branch.
 
 ---
 
-Step 2: Create a New Branch
+## Step 2: Create Feature1 Branch
 
+```bash
 git checkout -b feature1
+```
 
-Purpose
+### Purpose
 
-Create a separate workspace for a new feature.
+Create a separate workspace for Button feature.
 
-What Happens?
+### What Happens?
 
 Before:
 
+```text
 main
+```
 
 After:
 
+```text
 main
-  └── feature1
+  \
+   feature1
+```
 
-Now changes in feature1 will not affect main.
-
+Now changes in `feature1` will not affect `main`.
 
 ---
 
-Step 3: Modify the File
+## Step 3: Modify File in Feature1
 
-Example:
+`login.txt`
 
-<p>Add Button</p>
+```text
+Login Page
+<p>Button</p>
+```
 
 Save the file.
 
 Git notices the file has changed.
 
-
 ---
 
-Step 4: Check What Changed
+## Step 4: Check What Changed
 
+```bash
 git status
+```
 
-Purpose
+### Purpose
 
 Shows modified files.
 
 Example:
 
-modified: index.html
-
+```text
+modified: login.txt
+```
 
 ---
 
-Step 5: Add Changes to Staging Area
+## Step 5: Add Changes to Staging Area
 
+```bash
 git add .
+```
 
-Purpose
+### Purpose
 
 Prepare files for commit.
 
-Flow
+### Flow
 
+```text
 Working Directory
         ↓
      git add
         ↓
    Staging Area
+```
 
 Think of this as putting files into a box before shipping them.
 
-
 ---
 
-Step 6: Save Changes Permanently
+## Step 6: Save Changes Permanently
 
+```bash
 git commit -m "Add Button"
+```
 
-Purpose
+### Purpose
 
 Create a snapshot of your work.
 
-What Happens?
+### What Happens?
 
 Git stores your work in project history.
 
-
 ---
 
-Step 7: Switch to Another Branch
+## Step 7: Switch Back to Main
 
+```bash
 git checkout main
+```
 
-Purpose
+### Purpose
 
 Move back to the main branch.
 
+---
+
+## Step 8: Create Feature2 Branch
+
+```bash
+git checkout -b feature2
+```
+
+### Purpose
+
+Create another feature branch.
+
+### Branch Structure
+
+```text
+           feature1
+          /
+main -----
+          \
+           feature2
+```
 
 ---
 
-Step 8: Someone Else Makes Changes
+## Step 9: Modify the Same File in Feature2
 
-Suppose another developer changes the same file:
+`login.txt`
 
-<p>Add Dropdown</p>
+```text
+Login Page
+<p>Dropdown</p>
+```
 
-Then saves it.
+Save the file.
 
+Notice that the same line was modified differently.
 
 ---
 
-Step 9: Add and Commit
+## Step 10: Add and Commit
 
+```bash
 git add .
 git commit -m "Add Dropdown"
+```
 
 Now both branches have different versions of the same file.
 
-
 ---
 
-Step 10: Compare Changes
+## Step 11: Compare Branches
 
-git diff main
+```bash
+git diff feature1 feature2
+```
 
-Purpose
+### Purpose
 
 See differences between branches.
 
 Git shows what has changed.
 
+Example:
+
+```diff
+- <p>Button</p>
++ <p>Dropdown</p>
+```
 
 ---
 
-Step 11: Merge Branches
+## Step 12: Merge Feature1 into Main
 
+```bash
 git checkout main
 git merge feature1
+```
 
-Purpose
+### Purpose
 
-Bring feature1 changes into main.
+Bring Button changes into main.
 
+Current state:
+
+```text
+main (Button)
+```
 
 ---
 
-What Happens During Merge?
+## Step 13: Merge Feature2 into Main
 
-Case 1: Different Lines Modified
+```bash
+git merge feature2
+```
 
-Main:
+### Purpose
 
-<h1>Welcome</h1>
+Bring Dropdown changes into main.
 
-Feature1:
-
-<p>Add Button</p>
-
-Git can merge automatically.
+Git detects both branches changed the same line.
 
 Result:
 
-<h1>Welcome</h1>
-<p>Add Button</p>
-
-No conflict.
-
+```text
+CONFLICT (content): Merge conflict in login.txt
+Automatic merge failed
+```
 
 ---
 
-Case 2: Same Line Modified
+## What Happens During Conflict?
 
-Main:
+### Main Branch
 
-<p>Add Button</p>
+```text
+Login Page
+<p>Button</p>
+```
 
-Feature1:
+### Feature2 Branch
 
-<p>Add Dropdown</p>
+```text
+Login Page
+<p>Dropdown</p>
+```
 
 Git becomes confused.
 
 Result:
 
-Merge Conflict
-
+### Merge Conflict
 
 ---
 
-Step 12: Open Conflicted File
+## Step 14: Open Conflicted File
 
 Git adds markers:
 
+```text
 <<<<<<< HEAD
-<p>Add Button</p>
+<p>Button</p>
 =======
-<p>Add Dropdown</p>
->>>>>>> feature1
+<p>Dropdown</p>
+>>>>>>> feature2
+```
 
-Meaning
+### Meaning
 
-<<<<<<< HEAD
-Current branch code
+`<<<<<<< HEAD`
 
-=======
+Current branch code (`main`)
+
+`=======`
+
 Separator
 
->>>>>>> feature1
-Incoming branch code
+`>>>>>>> feature2`
 
+Incoming branch code
 
 ---
 
-Step 13: Resolve Conflict Manually
+## Step 15: Resolve Conflict Manually
 
 Choose the final code.
 
 Example:
 
-<p>Add Button</p>
-<p>Add Dropdown</p>
+```text
+Login Page
+<p>Button</p>
+<p>Dropdown</p>
+```
 
 Remove all conflict markers.
 
 Save the file.
 
-
 ---
 
-Step 14: Tell Git Conflict is Solved
+## Step 16: Tell Git Conflict is Solved
 
-git add index.html
+```bash
+git add login.txt
+```
 
-Purpose
+### Purpose
 
 Marks the file as resolved.
 
-
 ---
 
-Step 15: Complete Merge
+## Step 17: Complete Merge
 
-git commit -m "Resolve Merge Conflict"
+```bash
+git commit -m "Resolve merge conflict"
+```
 
-Purpose
+### Purpose
 
 Create a new commit containing the merged result.
 
+---
+
+## View Branch History
+
+```bash
+git log --oneline --graph --all
+```
+
+Example:
+
+```text
+*   c93bba3 Resolve merge conflict
+|\  
+| * 41a206d Add Dropdown
+* | e0bd197 Add Button
+|/
+* cb1eb98 Added login page
+```
+
+This shows:
+
+* Feature1 → Add Button
+* Feature2 → Add Dropdown
+* Main → Resolve merge conflict
 
 ---
 
-Pull Command
+## Pull Command
 
+```bash
 git pull origin main
+```
 
-Purpose
+### Purpose
 
 Get latest changes from GitHub.
 
 Internally Git Runs
 
+```bash
 git fetch
 git merge
+```
 
-Flow
+### Flow
 
+```text
 GitHub Repository
          ↓
       git pull
          ↓
  Local Repository Updated
-
+```
 
 ---
 
-Undo Staged Changes
+## Undo Staged Changes
 
-Remove One File from Staging
+### Remove One File from Staging
 
-git reset index.html
+```bash
+git reset login.txt
+```
 
-Remove All Files from Staging
+### Remove All Files from Staging
 
+```bash
 git reset
+```
 
-What Happens?
+### What Happens?
 
+```text
 Staging Area
       ↓
    git reset
       ↓
 Working Directory
+```
 
 Files are not deleted.
 
 Only unstaged.
 
-
 ---
 
-Complete Real Project Flow
+## Complete Real Project Flow
 
+```bash
 git clone <repository-url>
-
-git branch
 
 git checkout -b feature1
 
 # Make changes
 
-git status
-
 git add .
-
 git commit -m "Add Button"
 
 git checkout main
 
-git pull origin main
+git checkout -b feature2
+
+# Make changes
+
+git add .
+git commit -m "Add Dropdown"
+
+git checkout main
 
 git merge feature1
+git merge feature2
 
 # If conflict occurs
 # Edit file manually
 
-git add .
+git add login.txt
 
-git commit -m "Resolve Merge Conflict"
+git commit -m "Resolve merge conflict"
 
 git push origin main
+```
 
-One-Line Summary
+## One-Line Summary
 
-Git Flow = Create Branch → Make Changes → Add → Commit → Merge → Resolve Conflict (if any) → Commit → Push.
-
+**Git Flow = Create Branch → Make Changes → Add → Commit → Merge → Conflict (Same Line Modified) → Resolve Conflict → Commit → Push**.
