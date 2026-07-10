@@ -1,153 +1,343 @@
-# Git Notes - Chapter 4: `git stash`
+# Git Notes - Chapter 5: `git stash list` & `git stash pop`
 
 ---
 
-# Topic: `git stash`
+# Topic 1 - `git stash list`
 
-## What is `git stash`?
+## What is `git stash list`?
 
-`git stash` is a Git command used to **temporarily save uncommitted changes** (both modified and staged files) without creating a commit.
+`git stash list` is used to **display all the stashes stored in your local Git repository**.
 
-After saving the changes, Git restores your project to the **last committed state**, so your working directory becomes clean.
+It does **not** restore or delete anything.
+
+It only shows the list of saved stashes.
 
 ### One-Line Definition
 
-> **`git stash` temporarily saves your unfinished work and restores your project to the last committed version without creating a commit.**
+> **`git stash list` displays all the temporary stashes saved in the local repository.**
 
 ---
 
-# Why do we need `git stash`?
+# Why Do We Need `git stash list`?
 
-Imagine you are developing a Login Page.
-
-Current progress:
-
-* Login UI ✅
-* Validation 🚧 (Incomplete)
-
-Suddenly your team lead says:
-
-> "A production bug has been reported. Fix it immediately."
-
-You cannot:
-
-❌ Commit incomplete code.
-
-❌ Delete your unfinished work.
-
-Instead, use
+Suppose you have used
 
 ```bash
 git stash
 ```
 
-Git safely stores your unfinished work.
+many times.
 
-Now your project becomes clean.
+You may forget:
 
-After fixing the bug, you can continue your previous work.
+* How many stashes exist?
+* Which stash is the latest?
+* Is there any stash available?
 
----
+Instead of guessing, run
 
-# Prerequisites
-
-Before learning `git stash`, you should know:
-
-* git init
-* git add
-* git commit
-* git status
-
----
-
-# Git Internal Structure
-
-Git has three important areas.
-
-```text
-                 Working Directory
-             (Where you write code)
-
-                       │
-                git add
-                       │
-
-                       ▼
-
-                 Staging Area
-           (Ready for next commit)
-
-                       │
-              git commit
-                       │
-
-                       ▼
-
-               Local Repository
-             (Commit History)
+```bash
+git stash list
 ```
 
-`git stash` creates another temporary storage.
+---
 
-```text
-Working Directory
+# Practical Example
 
-        │
+## Step 1
 
+Modify a file
+
+```bash
+echo "<h2>Login Feature</h2>" >> index.html
+```
+
+---
+
+## Step 2
+
+Save it
+
+```bash
 git stash
-
-        ▼
-
-Git Stash (Temporary Storage)
-```
-
----
-
-# Practical Execution (Step by Step)
-
-## Step 1 - Create a Project
-
-```bash
-mkdir git_stash
-```
-
-Creates a new folder.
-
----
-
-Move inside
-
-```bash
-cd git_stash
-```
-
----
-
-Initialize Git
-
-```bash
-git init
 ```
 
 Output
 
 ```text
-Initialized empty Git repository
+Saved working directory and index state WIP on main
 ```
-
-What happened?
-
-Git created a hidden `.git` folder.
-
-Now this folder is a Git repository.
 
 ---
 
-## Step 2 - Create a File
+## Step 3
+
+Again modify
 
 ```bash
-echo "<h1>Hello</h1>" > index.html
+echo "<p>Signup Page</p>" >> index.html
 ```
+
+---
+
+## Step 4
+
+Again stash
+
+```bash
+git stash
+```
+
+Now you have two stashes.
+
+---
+
+## Step 5
+
+Run
+
+```bash
+git stash list
+```
+
+Example Output
+
+```text
+stash@{0}: WIP on main: Second Commit
+
+stash@{1}: WIP on main: First Commit
+```
+
+Meaning
+
+```text
+stash@{0}
+
+↓
+
+Latest Stash
+```
+
+```text
+stash@{1}
+
+↓
+
+Older Stash
+```
+
+Git always keeps the newest stash at the top.
+
+---
+
+# Internal Working
+
+```text
+Working Directory
+
+↓
+
+git stash
+
+↓
+
+Git Stash
+
+stash@{0}
+
+↓
+
+Newest
+```
+
+Older stashes move down.
+
+---
+
+# Real-Life Example
+
+Imagine a cupboard.
+
+Every time you put a file inside,
+
+the newest file stays on the top.
+
+`git stash list` simply opens the cupboard and shows all saved files.
+
+---
+
+# Common Mistakes
+
+### Mistake
+
+I thought
+
+```bash
+git stash list
+```
+
+restores my code.
+
+Wrong.
+
+It only displays the list.
+
+Nothing changes in your project.
+
+---
+
+# Frequently Used Command
+
+```bash
+git stash list
+```
+
+---
+
+# Topic 2 - `git stash pop`
+
+## What is `git stash pop`?
+
+`git stash pop` restores the latest stash back into the Working Directory and then removes it from the stash list.
+
+### One-Line Definition
+
+> **`git stash pop` restores the latest stashed changes and automatically removes that stash from the list.**
+
+---
+
+# Why Do We Need `git stash pop`?
+
+Imagine this workflow.
+
+```text
+Working on Login Feature
+
+↓
+
+git stash
+
+↓
+
+Fix Urgent Bug
+
+↓
+
+Commit Bug Fix
+
+↓
+
+Need Login Feature Again
+```
+
+Instead of rewriting the code,
+
+Run
+
+```bash
+git stash pop
+```
+
+Git restores everything.
+
+---
+
+# Practical Execution
+
+## Step 1
+
+Current file
+
+```html
+<h1>Hello</h1>
+```
+
+---
+
+## Step 2
+
+Modify
+
+```bash
+echo "<p>Login Feature</p>" >> index.html
+```
+
+Current file
+
+```html
+<h1>Hello</h1>
+<p>Login Feature</p>
+```
+
+---
+
+## Step 3
+
+Save
+
+```bash
+git stash
+```
+
+File becomes
+
+```html
+<h1>Hello</h1>
+```
+
+Your changes are inside the stash.
+
+---
+
+## Step 4
+
+Do another task
+
+Example
+
+```text
+Fix Payment Bug
+```
+
+Complete it.
+
+Commit it.
+
+Push it.
+
+---
+
+## Step 5
+
+Now continue Login Feature
+
+Run
+
+```bash
+git stash pop
+```
+
+Example Output
+
+```text
+On branch main
+
+Changes not staged for commit:
+
+modified: index.html
+
+Dropped refs/stash@{0}
+```
+
+Meaning
+
+Git has restored your changes.
+
+The stash has been deleted because it is no longer needed.
+
+---
+
+## Step 6
 
 Check file
 
@@ -159,266 +349,10 @@ Output
 
 ```html
 <h1>Hello</h1>
+<p>Login Feature</p>
 ```
 
----
-
-## Step 3 - Check Git Status
-
-```bash
-git status
-```
-
-Output
-
-```text
-Untracked files:
-
-index.html
-```
-
-Meaning
-
-Git can see the file.
-
-But it is NOT tracking it yet.
-
----
-
-## Step 4 - Track the File
-
-```bash
-git add .
-```
-
-Check
-
-```bash
-git status
-```
-
-Output
-
-```text
-Changes to be committed:
-
-new file: index.html
-```
-
-Meaning
-
-The file is ready to be committed.
-
----
-
-## Step 5 - Commit
-
-```bash
-git commit -m "First Commit"
-```
-
-Check
-
-```bash
-git status
-```
-
-Output
-
-```text
-nothing to commit, working tree clean
-```
-
-Meaning
-
-Everything has been saved.
-
----
-
-## Step 6 - Modify the File
-
-Append new content.
-
-```bash
-echo "<p>Learning Git Stash</p>" >> index.html
-```
-
-Check
-
-```bash
-cat index.html
-```
-
-Output
-
-```html
-<h1>Hello</h1>
-<p>Learning Git Stash</p>
-```
-
----
-
-## Step 7 - Check Status
-
-```bash
-git status
-```
-
-Output
-
-```text
-modified: index.html
-```
-
-Meaning
-
-The file has changed after the last commit.
-
----
-
-## Step 8 - Save the Unfinished Work
-
-Run
-
-```bash
-git stash
-```
-
-Example Output
-
-```text
-Saved working directory and index state WIP on main
-```
-
-Meaning
-
-Git has stored your unfinished work in the stash.
-
----
-
-## Step 9 - Check Status Again
-
-```bash
-git status
-```
-
-Output
-
-```text
-nothing to commit, working tree clean
-```
-
-Meaning
-
-Your working directory is clean again.
-
----
-
-## Step 10 - Check the File
-
-```bash
-cat index.html
-```
-
-Output
-
-```html
-<h1>Hello</h1>
-```
-
-Question
-
-Where did
-
-```html
-<p>Learning Git Stash</p>
-```
-
-go?
-
-Answer
-
-Git stored it safely inside the stash.
-
-It is NOT deleted.
-
----
-
-# How to Verify the Stash
-
-Run
-
-```bash
-git stash list
-```
-
-Example
-
-```text
-stash@{0}: WIP on main: First Commit
-```
-
-Meaning
-
-Your unfinished work is safely stored.
-
----
-
-# How to See What Is Inside the Stash
-
-Run
-
-```bash
-git stash show -p
-```
-
-Example
-
-```diff
-diff --git a/index.html b/index.html
-
-@@
-
- <h1>Hello</h1>
-+<p>Learning Git Stash</p>
-```
-
-The **+** means that line is stored in the stash.
-
----
-
-# How to Restore the Stash
-
-Run
-
-```bash
-git stash pop
-```
-
-Output
-
-```text
-Dropped refs/stash@{0}
-```
-
-Meaning
-
-Git restored your work and removed that stash entry.
-
-Check
-
-```bash
-cat index.html
-```
-
-Output
-
-```html
-<h1>Hello</h1>
-<p>Learning Git Stash</p>
-```
-
-Your changes are back.
+Your unfinished work is back.
 
 ---
 
@@ -427,31 +361,9 @@ Your changes are back.
 Before
 
 ```text
-Working Directory
-
-Hello
-Learning Git Stash
-```
-
-Run
-
-```bash
-git stash
-```
-
-After
-
-```text
-Working Directory
-
-Hello
-
-↓
-
 Git Stash
 
-Hello
-Learning Git Stash
+Login Feature
 ```
 
 Run
@@ -460,34 +372,39 @@ Run
 git stash pop
 ```
 
-Result
+After
 
 ```text
 Working Directory
 
-Hello
-Learning Git Stash
+Login Feature
+
+↓
+
+Git Stash
+
+Empty
 ```
+
+The stash moves back to the Working Directory.
 
 ---
 
 # Real-Life Example
 
-Imagine you are writing an assignment.
+Imagine a drawer.
 
-Teacher suddenly says:
-
-> "Leave your notebook and solve another question."
-
-You put the notebook in a drawer.
+You keep your notebook inside.
 
 Drawer = Git Stash
 
-Later you take it back.
+Later
 
-Notebook = Working Directory
+You take the notebook back.
 
-Nothing was lost.
+The drawer becomes empty.
+
+That is exactly how `git stash pop` works.
 
 ---
 
@@ -498,95 +415,89 @@ Nothing was lost.
 I thought
 
 ```bash
-git stash
+git stash pop
 ```
 
-deleted my code.
+only restores the stash.
 
 Wrong.
 
-It only hides your changes.
+It restores the stash **and removes it** from the stash list.
 
 ---
 
 ### Mistake 2
 
-I got
+I ran
+
+```bash
+git stash pop
+```
+
+but there was no stash.
+
+Output
 
 ```text
-No local changes to save
+No stash entries found.
 ```
 
 Reason
 
-There were no modified or staged files.
-
-Git had nothing to save.
+There is nothing saved.
 
 ---
 
 ### Mistake 3
 
-After running
+I thought
 
 ```bash
-git stash
+git stash pop
 ```
 
-my changes disappeared.
+creates a commit.
 
-Reason
+Wrong.
 
-This is normal.
+It only restores your changes.
 
-Git restored the project to the last commit.
-
-Use
+You still need
 
 ```bash
-git stash list
+git add .
+git commit -m "..."
 ```
 
-or
-
-```bash
-git stash show -p
-```
-
-to verify the changes are still stored.
+to save them permanently.
 
 ---
 
 # Best Practices
 
-* Always check `git status` before using `git stash`.
-* Use `git stash` only for temporary work.
-* Restore your work with `git stash pop` when you're ready to continue.
-* Don't use `git stash` as a permanent backup.
+✔ Use `git stash` before switching tasks.
+
+✔ Use `git stash pop` after finishing the other task.
+
+✔ Check `git stash list` if you have multiple stashes.
 
 ---
 
 # Frequently Used Commands
 
-Save current work
+Save work
 
 ```bash
 git stash
 ```
 
-View saved stashes
+Show all stashes
 
 ```bash
 git stash list
 ```
 
-View stash contents
-
-```bash
-git stash show -p
-```
-
-Restore and remove stash
+Restore latest stash
 
 ```bash
 git stash pop
@@ -596,41 +507,69 @@ git stash pop
 
 # Interview Questions
 
-### What is `git stash`?
+### What does `git stash list` do?
 
-It temporarily saves uncommitted changes and cleans the working directory.
+It displays all saved stashes in the local repository.
 
-### Does `git stash` create a commit?
+---
+
+### What does `git stash pop` do?
+
+It restores the latest stash and removes it from the stash list.
+
+---
+
+### Does `git stash pop` create a commit?
 
 No.
 
-### Does `git stash` upload code to GitHub?
+---
 
-No.
+### What happens after `git stash pop`?
 
-### Where are stashes stored?
-
-Inside your local Git repository.
-
-### How do you view a stash?
-
-```bash
-git stash show -p
-```
-
-### How do you restore a stash?
-
-```bash
-git stash pop
-```
+* Changes return to the Working Directory.
+* The restored stash is removed from the stash list.
 
 ---
 
 # Summary
 
-* `git stash` saves unfinished work temporarily.
-* It restores your working directory to the last committed state.
-* Your work is not deleted; it is stored in the stash.
-* Use `git stash list` to see saved stashes.
-* Use `git stash show -p` to inspect them.
-* Use `git stash pop` to continue your work later.
+## `git stash list`
+
+* Shows all saved stashes.
+* Does not restore or delete anything.
+
+## `git stash pop`
+
+* Restores the latest stash.
+* Removes it from the stash list.
+* Lets you continue your unfinished work.
+
+---
+
+# Complete Workflow
+
+```text
+Start Working
+      │
+      ▼
+Modify Files
+      │
+      ▼
+git stash
+      │
+      ▼
+Work on Another Task
+      │
+      ▼
+Commit & Push
+      │
+      ▼
+git stash list (Optional)
+      │
+      ▼
+git stash pop
+      │
+      ▼
+Continue Previous Work
+```
